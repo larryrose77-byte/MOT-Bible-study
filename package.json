@@ -8,9 +8,13 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "deploy": "astro build && wrangler pages deploy dist --project-name=mot-bible-study --branch=main --commit-dirty=true",
     "astro": "astro"
   },
   "dependencies": {
     "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
   }
 }

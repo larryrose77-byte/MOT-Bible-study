@@ -12,7 +12,10 @@ Built with [Astro](https://astro.build/), hosted on [Cloudflare Pages](https://p
 npm install        # only the first time, or after pulling new changes
 npm run dev        # preview at http://localhost:4321
 npm run build      # produce a production build in dist/
+npm run deploy     # build AND publish to Cloudflare Pages (live in ~30 sec)
 ```
+
+**Live site:** https://mot-bible-study.pages.dev
 
 ---
 
@@ -36,7 +39,8 @@ npm run build      # produce a production build in dist/
    Discussion notes here...
    ```
 
-5. **Commit and push** to GitHub. Cloudflare Pages will automatically build and deploy.
+5. **Publish:** run `npm run deploy` from the project folder. This builds the site and pushes it to Cloudflare Pages in one step. Live in ~30 seconds.
+6. **(Optional) Back up to GitHub:** `git add . && git commit -m "Genesis 1:6-13" && git push`. The GitHub repo is for version history only — Cloudflare deploys from your local `dist/` directory, not from GitHub.
 
 ### Frontmatter reference
 
