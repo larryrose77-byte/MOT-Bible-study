@@ -159,14 +159,14 @@ a:hover { color: var(--color-accent-hover); }
   margin: 0.5rem 0 1rem;
 }
 
-.audio {
+.media {
   background: var(--color-card);
   border: 1px solid var(--color-rule);
   border-radius: 6px;
   padding: 1.25rem;
   margin: 2rem 0;
 }
-.audio h2 {
+.media h2 {
   font-family: var(--font-sans);
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -175,20 +175,45 @@ a:hover { color: var(--color-accent-hover); }
   font-weight: 600;
   margin: 0 0 0.75rem;
 }
-.audio .duration {
+.media .duration {
   text-transform: none;
   letter-spacing: 0;
   font-style: italic;
   font-weight: 400;
 }
-.audio audio {
+.media audio,
+.media video {
   width: 100%;
   display: block;
+  background: #000;
+  border-radius: 4px;
 }
-.audio-download {
-  margin: 0.75rem 0 0;
+
+.downloads {
+  margin: 2rem 0;
+}
+.downloads h2 {
   font-family: var(--font-sans);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+}
+.downloads ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+}
+.downloads li {
+  margin: 0.4rem 0;
+}
+.downloads a::before {
+  content: "↓ ";
+  color: var(--color-muted);
 }
 
 .prose h2, .prose h3 { font-family: var(--font-serif); }

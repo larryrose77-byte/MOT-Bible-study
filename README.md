@@ -2,90 +2,107 @@
 
 The website for the **MOT Bible Study** — a weekly verse-by-verse walk through the Bible.
 
-Built with [Astro](https://astro.build/), hosted on [Cloudflare Pages](https://pages.cloudflare.com/) (free tier), with audio recordings hosted on [Cloudflare R2](https://developers.cloudflare.com/r2/) (also free tier).
+- **Live site:** https://mot-bible-study.pages.dev
+- **Source:** https://github.com/larryrose77-byte/MOT-Bible-study
+- **R2 bucket:** `mot-bible-study-audio` (public base URL: `https://pub-8b4873e4638c435e9e97e2f4e20637ca.r2.dev`)
+- **Stack:** Astro 5 static site · Cloudflare Pages (hosting) · Cloudflare R2 (video/audio/transcripts) · OpenAI Whisper (local transcription)
 
 ---
 
-## Quick start
+## Quick reference
 
 ```sh
-npm install                                      # first time, or after pulling new changes
-npm run dev                                      # preview at http://localhost:4321
-npm run build                                    # produce a production build in dist/
-npm run deploy                                   # build AND publish to Cloudflare Pages
-npm run audio:upload -- path\to\recording.mp3    # upload an MP3 to R2 and print the URL
+npm install                                         # first time, or after pulling new changes
+npm run dev                                         # local preview at http://localhost:4321
+npm run build                                       # production build into dist/
+npm run deploy                                      # build AND publish to Cloudflare Pages
+npm run transcribe         -- path\to\audio.m4a     # local Whisper -> Word document
+npm run audio:upload       -- path\to\audio.m4a     # upload to R2, print URL
+npm run video:upload       -- path\to\video.mp4     # upload to R2, print URL
+npm run transcript:upload  -- path\to\audio.docx    # upload to R2, print URL
 ```
-
-**Live site:** https://mot-bible-study.pages.dev
-**Audio bucket:** `mot-bible-study-audio` (public base URL: `https://pub-8b4873e4638c435e9e97e2f4e20637ca.r2.dev`)
 
 ---
 
-## Posting a new weekly study
+## Posting a weekly study
 
-1. **Record the discussion** (Zoom cloud recording, your phone, etc.) and export it as an MP3. Name it something like `2026-06-23.mp3`.
-2. **Upload to R2** with one command:
+1. **Record** Monday's discussion via Zoom (local recording). You'll end up with `videoXXXX.mp4` and `audioXXXX.m4a` in `Documents\Zoom\<date> <topic>\`.
+
+2. **Transcribe** the audio to a Word document. From the project folder:
    ```sh
-   npm run audio:upload -- 2026-06-23.mp3
+   npm run transcribe -- "C:\Users\larry\Documents\Zoom\2026-06-23 ...\audioXXXX.m4a"
    ```
-   The script prints the public URL when done. Copy that URL — you'll paste it into the next step.
-3. **Create a new Markdown file** in `src/content/studies/` named after the date and passage, e.g. `2026-06-23-genesis-1-6-13.md`. Copy any existing file as a template.
-4. **Fill in the frontmatter and notes**:
+   Produces `audioXXXX.docx` next to the audio file. Default model is `base.en`; use `--model=small.en` or `--model=medium.en` for better quality at the cost of longer processing time.
 
+3. **Upload** the three assets to R2 (each command prints the public URL):
+   ```sh
+   npm run audio:upload      -- "C:\...\audioXXXX.m4a"
+   npm run video:upload      -- "C:\...\videoXXXX.mp4"
+   npm run transcript:upload -- "C:\...\audioXXXX.docx"
+   ```
+
+4. **Create the Markdown post** in `src/content/studies/` — name it `YYYY-MM-DD-passage.md` (e.g. `2026-06-23-genesis-1-6-13.md`). Copy `2026-06-16-sample-study.md` as a starting point. Paste the three URLs into the frontmatter:
    ```markdown
    ---
    title: "Genesis 1:6-13 — Sky, Sea, and Land"
    date: 2026-06-23
    passage: "Genesis 1:6-13"
-   audioUrl: "https://your-r2-bucket.example.com/2026-06-23.mp3"
+   audioUrl: "https://pub-XXX.r2.dev/audioXXXX.m4a"
+   audioType: "audio/mp4"
+   videoUrl: "https://pub-XXX.r2.dev/videoXXXX.mp4"
+   transcriptUrl: "https://pub-XXX.r2.dev/audioXXXX.docx"
    duration: "62 min"
    summary: "Day Two and Day Three of creation, and what 'separation' meant to the original audience."
    ---
 
-   Discussion notes here...
+   Discussion notes here, in Markdown...
    ```
 
-5. **Publish:** run `npm run deploy` from the project folder. This builds the site and pushes it to Cloudflare Pages in one step. Live in ~30 seconds.
-6. **(Optional) Back up to GitHub:** `git add . && git commit -m "Genesis 1:6-13" && git push`. The GitHub repo is for version history only — Cloudflare deploys from your local `dist/` directory, not from GitHub.
+5. **Publish:**
+   ```sh
+   npm run deploy
+   ```
+   Live in ~30 seconds.
+
+6. **(Optional) back up source to GitHub:**
+   ```sh
+   git add . && git commit -m "Genesis 1:6-13" && git push
+   ```
+   Audio/video/docx files are git-ignored — only Markdown + code go to GitHub.
 
 ### Frontmatter reference
 
-| Field       | Required | Notes                                                                                            |
-| ----------- | -------- | ------------------------------------------------------------------------------------------------ |
-| `title`     | yes      | Shown at the top of the page and on the home-page card.                                          |
-| `date`      | yes      | `YYYY-MM-DD`. Used for sorting (newest first) and shown on the page.                             |
-| `passage`   | yes      | Free-form (e.g. `"John 3:1-21"`). Automatically linked to Bible Gateway in the NIV.              |
-| `audioUrl`  | no       | Public URL to the recording (R2, S3, etc.). If omitted, no audio player shows.                   |
-| `audioType` | no       | Defaults to `audio/mpeg` (MP3). Other options: `audio/mp4`, `audio/wav`, `audio/ogg`.            |
-| `duration`  | no       | Human-readable, e.g. `"58 min"`.                                                                 |
-| `summary`   | no       | One- or two-sentence summary, shown on the card and at the top of the study page.                |
-| `draft`     | no       | Set to `true` to hide a post from the site (useful for in-progress notes).                       |
+| Field           | Required | Notes                                                                       |
+| --------------- | -------- | --------------------------------------------------------------------------- |
+| `title`         | yes      | Shown at the top of the page and on the home-page card.                     |
+| `date`          | yes      | `YYYY-MM-DD`. Used for sorting (newest first) and shown on the page.        |
+| `passage`       | yes      | Free-form (e.g. `"John 3:1-21"`). Auto-linked to Bible Gateway in the NIV.  |
+| `audioUrl`      | no       | Public URL to the audio. Shows audio player if no `videoUrl`.               |
+| `audioType`     | no       | `audio/mpeg` (default), `audio/mp4`, `audio/wav`, `audio/ogg`.              |
+| `videoUrl`      | no       | Public URL to the video. Shows video player when present (preferred).       |
+| `videoType`     | no       | `video/mp4` (default), `video/webm`, `video/quicktime`.                     |
+| `transcriptUrl` | no       | Public URL to the `.docx`. Shows as a download link.                        |
+| `duration`      | no       | Human-readable, e.g. `"62 min"`. Shown next to the player heading.          |
+| `summary`       | no       | One- or two-sentence summary, shown on the card and at the top of the page. |
+| `draft`         | no       | `true` to hide a post from the site.                                        |
 
 ---
 
-## One-time setup
+## What's installed
 
-### 1. Cloudflare R2 (for audio recordings)
+This machine is set up with everything needed:
 
-1. Sign in to Cloudflare and go to **R2 Object Storage**.
-2. Create a bucket (e.g. `mot-bible-study-audio`).
-3. Under **Settings → Public access**, either:
-   - Enable the bucket's public `r2.dev` URL (quickest), or
-   - Attach a custom subdomain like `audio.motbiblestudy.com` (cleaner).
-4. When posting each week, drag the MP3 into the bucket via the dashboard and copy the resulting public URL into the post's `audioUrl` field.
+| Tool                | Purpose                                            | Installed via               |
+| ------------------- | -------------------------------------------------- | --------------------------- |
+| Node.js 24 LTS      | Runs Astro and the scripts                         | `winget install OpenJS.NodeJS.LTS` |
+| Git for Windows     | Version control                                    | `winget install Git.Git`           |
+| GitHub CLI (`gh`)   | Repo creation, authentication                      | `winget install GitHub.cli`        |
+| Wrangler            | Cloudflare Pages deploys + R2 uploads              | `npm install -g wrangler`          |
+| Python 3.12         | Required by Whisper                                | `winget install Python.Python.3.12`|
+| FFmpeg              | Audio/video decoding for Whisper                   | `winget install Gyan.FFmpeg`       |
+| OpenAI Whisper      | Local transcription (no API, no per-minute cost)   | `py -m pip install openai-whisper` |
 
-**R2 free tier:** 10 GB storage, 1M Class-A operations/month, 10M Class-B operations/month, **zero egress fees**. Plenty of headroom for weekly recordings.
-
-### 2. Cloudflare Pages (for the website)
-
-1. Push this folder to a new GitHub repository.
-2. In the Cloudflare dashboard: **Workers & Pages → Create → Pages → Connect to Git**.
-3. Pick the repo. Cloudflare auto-detects Astro:
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-4. Deploy. You get a `*.pages.dev` URL immediately; attach a custom domain later in the Pages project settings if desired.
-
-Every `git push` to the main branch triggers a fresh build and deploy.
+`gh` and Wrangler are already authenticated — credentials persist across reboots.
 
 ---
 
@@ -93,27 +110,30 @@ Every `git push` to the main branch triggers a fresh build and deploy.
 
 ```
 mot-bible-study/
-├── public/                       # static files served as-is
-│   └── favicon.svg
+├── public/                     # static files served as-is
+├── scripts/
+│   ├── transcribe.mjs          # audio/video -> Word document via Whisper
+│   └── upload-asset.mjs        # generic R2 uploader (audio, video, docx, etc.)
 ├── src/
-│   ├── components/               # site header, footer, study card
+│   ├── components/             # site header, footer, study card
 │   ├── content/
-│   │   └── studies/              # weekly studies go here as .md files
-│   ├── content.config.ts         # validates the frontmatter schema
-│   ├── layouts/                  # the page shell (header, footer, <head>)
-│   ├── lib/
-│   │   └── bibleGateway.ts       # builds NIV-on-Bible-Gateway URLs
+│   │   └── studies/            # weekly studies go here as .md files
+│   ├── content.config.ts       # validates the frontmatter schema
+│   ├── layouts/                # the page shell (header, footer, <head>)
+│   ├── lib/bibleGateway.ts     # builds NIV-on-Bible-Gateway URLs
 │   ├── pages/
-│   │   ├── index.astro           # home page (list of studies)
+│   │   ├── index.astro         # home page (list of studies)
 │   │   └── studies/
-│   │       └── [...slug].astro   # individual study page
-│   └── styles/
-│       └── global.css            # all of the site's styling
-└── astro.config.mjs
+│   │       └── [...slug].astro # individual study page
+│   └── styles/global.css       # all of the site's styling
+├── astro.config.mjs
+└── package.json
 ```
+
+Media files (`*.mp4`, `*.m4a`, `*.mp3`, `*.docx`, etc.) are git-ignored — they live in R2.
 
 ---
 
 ## Translation note
 
-NIV verse text is copyrighted (Biblica / Zondervan). To keep things simple — and license-free — this site **links each passage out to Bible Gateway in the NIV** rather than embedding the verse text. If you ever want to embed the text directly on the page, apply for an NIV license at [thenivbible.com](https://www.thenivbible.com/).
+NIV verse text is copyrighted (Biblica / Zondervan). To keep things license-free, this site **links each passage out to Bible Gateway in the NIV** rather than embedding the verse text. To embed text directly, apply for an NIV license at [thenivbible.com](https://www.thenivbible.com/).

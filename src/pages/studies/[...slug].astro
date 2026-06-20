@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 
 const { study } = Astro.props;
 const { Content } = await render(study);
-const { title, date, passage, audioUrl, audioType, duration, summary } = study.data;
+const { title, date, passage, audioUrl, audioType, videoUrl, videoType, transcriptUrl, duration, summary } = study.data;
 const formattedDate = date.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
@@ -37,15 +37,35 @@ const passageUrl = bibleGatewayUrl(passage);
       {summary && <p class="study-summary">{summary}</p>}
     </header>
 
-    {audioUrl && (
-      <section class="audio">
+    {videoUrl && (
+      <section class="media">
+        <h2>Video {duration && <span class="duration">({duration})</span>}</h2>
+        <video controls preload="none" playsinline>
+          <source src={videoUrl} type={videoType} />
+          Your browser doesn't support video playback. <a href={videoUrl}>Download the video</a>.
+        </video>
+      </section>
+    )}
+
+    {audioUrl && !videoUrl && (
+      <section class="media">
         <h2>Recording {duration && <span class="duration">({duration})</span>}</h2>
         <audio controls preload="none">
           <source src={audioUrl} type={audioType} />
           Your browser doesn't support audio playback.
           <a href={audioUrl}>Download the recording</a>.
         </audio>
-        <p class="audio-download"><a href={audioUrl} download>Download recording</a></p>
+      </section>
+    )}
+
+    {(audioUrl || videoUrl || transcriptUrl) && (
+      <section class="downloads">
+        <h2>Downloads</h2>
+        <ul>
+          {videoUrl && <li><a href={videoUrl} download>Video (MP4)</a></li>}
+          {audioUrl && <li><a href={audioUrl} download>Audio (MP3/M4A)</a></li>}
+          {transcriptUrl && <li><a href={transcriptUrl} download>Transcript (Word document)</a></li>}
+        </ul>
       </section>
     )}
 

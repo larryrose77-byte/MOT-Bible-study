@@ -11,6 +11,11 @@ const studies = defineCollection({
     audioType: z
       .enum(['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg'])
       .default('audio/mpeg'),
+    videoUrl: z.string().url().optional(),
+    videoType: z
+      .enum(['video/mp4', 'video/webm', 'video/quicktime'])
+      .default('video/mp4'),
+    transcriptUrl: z.string().url().optional(),
     duration: z.string().optional(),
     summary: z.string().optional(),
     draft: z.boolean().default(false),

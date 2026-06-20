@@ -9,13 +9,17 @@
     "build": "astro build",
     "preview": "astro preview",
     "deploy": "astro build && wrangler pages deploy dist --project-name=mot-bible-study --branch=main --commit-dirty=true",
-    "audio:upload": "node scripts/upload-audio.mjs",
+    "audio:upload": "node scripts/upload-asset.mjs",
+    "video:upload": "node scripts/upload-asset.mjs",
+    "transcript:upload": "node scripts/upload-asset.mjs",
+    "transcribe": "node scripts/transcribe.mjs",
     "astro": "astro"
   },
   "dependencies": {
     "astro": "^5.0.0"
   },
   "devDependencies": {
+    "docx": "^9.7.1",
     "wrangler": "^4.0.0"
   }
 }

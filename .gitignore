@@ -22,3 +22,16 @@ Thumbs.db
 # editor
 .vscode/
 .idea/
+
+# media files belong in R2, not in git
+*.mp4
+*.mp3
+*.m4a
+*.wav
+*.ogg
+*.mov
+*.webm
+*.docx
+*.pdf
+demo-recording/
+recordings/
