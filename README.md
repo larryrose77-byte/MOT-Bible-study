@@ -9,20 +9,26 @@ Built with [Astro](https://astro.build/), hosted on [Cloudflare Pages](https://p
 ## Quick start
 
 ```sh
-npm install        # only the first time, or after pulling new changes
-npm run dev        # preview at http://localhost:4321
-npm run build      # produce a production build in dist/
-npm run deploy     # build AND publish to Cloudflare Pages (live in ~30 sec)
+npm install                                      # first time, or after pulling new changes
+npm run dev                                      # preview at http://localhost:4321
+npm run build                                    # produce a production build in dist/
+npm run deploy                                   # build AND publish to Cloudflare Pages
+npm run audio:upload -- path\to\recording.mp3    # upload an MP3 to R2 and print the URL
 ```
 
 **Live site:** https://mot-bible-study.pages.dev
+**Audio bucket:** `mot-bible-study-audio` (public base URL: `https://pub-8b4873e4638c435e9e97e2f4e20637ca.r2.dev`)
 
 ---
 
 ## Posting a new weekly study
 
-1. **Record the discussion** (Zoom cloud recording, your phone, etc.) and export it as an MP3.
-2. **Upload the MP3 to your Cloudflare R2 bucket** (via the Cloudflare dashboard, drag-and-drop). Copy the public URL.
+1. **Record the discussion** (Zoom cloud recording, your phone, etc.) and export it as an MP3. Name it something like `2026-06-23.mp3`.
+2. **Upload to R2** with one command:
+   ```sh
+   npm run audio:upload -- 2026-06-23.mp3
+   ```
+   The script prints the public URL when done. Copy that URL — you'll paste it into the next step.
 3. **Create a new Markdown file** in `src/content/studies/` named after the date and passage, e.g. `2026-06-23-genesis-1-6-13.md`. Copy any existing file as a template.
 4. **Fill in the frontmatter and notes**:
 
