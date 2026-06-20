@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StudyCard from '../components/StudyCard.astro';
+
+const studies = (await getCollection('studies', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+---
+<BaseLayout title="MOT Bible Study">
+  <section class="intro">
+    <h1>MOT Bible Study</h1>
+    <p class="tagline">
+      A weekly verse-by-verse walk through the Bible, recorded for those who couldn't make it live.
+    </p>
+    <p>
+      Member of Tribe gathers on Monday evenings to read and discuss Scripture together. Each
+      week's recording and the passages we covered are posted here.
+    </p>
+  </section>
+
+  <section class="studies">
+    <h2 class="section-title">Recent studies</h2>
+    {studies.length === 0 ? (
+      <p class="empty">No studies posted yet. Check back after the next session.</p>
+    ) : (
+      <ul class="study-list">
+        {studies.map((s) => (
+          <li>
+            <StudyCard
+              href={`/studies/${s.id}/`}
+              title={s.data.title}
+              date={s.data.date}
+              passage={s.data.passage}
+              summary={s.data.summary}
+            />
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</BaseLayout>

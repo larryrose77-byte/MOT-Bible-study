@@ -1,0 +1,26 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  date: Date;
+  passage: string;
+  summary?: string;
+}
+const { href, title, date, passage, summary } = Astro.props;
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+---
+<article class="study-card">
+  <a href={href} class="study-card-link">
+    <p class="study-meta">
+      <time datetime={date.toISOString()}>{formattedDate}</time>
+      <span class="study-passage">{passage}</span>
+    </p>
+    <h2 class="study-title">{title}</h2>
+    {summary && <p class="study-summary">{summary}</p>}
+  </a>
+</article>

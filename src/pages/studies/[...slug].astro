@@ -1,0 +1,58 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { bibleGatewayUrl } from '../../lib/bibleGateway';
+
+export async function getStaticPaths() {
+  const studies = await getCollection('studies', ({ data }) => !data.draft);
+  return studies.map((study) => ({
+    params: { slug: study.id },
+    props: { study },
+  }));
+}
+
+const { study } = Astro.props;
+const { Content } = await render(study);
+const { title, date, passage, audioUrl, audioType, duration, summary } = study.data;
+const formattedDate = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+const passageUrl = bibleGatewayUrl(passage);
+---
+<BaseLayout title={title} description={summary}>
+  <article class="study">
+    <header class="study-header">
+      <p class="study-meta">
+        <time datetime={date.toISOString()}>{formattedDate}</time>
+      </p>
+      <h1>{title}</h1>
+      <p class="study-passage-link">
+        <a href={passageUrl} target="_blank" rel="noopener noreferrer">
+          Read {passage} on Bible Gateway (NIV) &rarr;
+        </a>
+      </p>
+      {summary && <p class="study-summary">{summary}</p>}
+    </header>
+
+    {audioUrl && (
+      <section class="audio">
+        <h2>Recording {duration && <span class="duration">({duration})</span>}</h2>
+        <audio controls preload="none">
+          <source src={audioUrl} type={audioType} />
+          Your browser doesn't support audio playback.
+          <a href={audioUrl}>Download the recording</a>.
+        </audio>
+        <p class="audio-download"><a href={audioUrl} download>Download recording</a></p>
+      </section>
+    )}
+
+    <section class="notes prose">
+      <Content />
+    </section>
+
+    <p class="back"><a href="/">&larr; All studies</a></p>
+  </article>
+</BaseLayout>

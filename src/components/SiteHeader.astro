@@ -1,0 +1,15 @@
+---
+const path = Astro.url.pathname;
+const isHome = path === '/' || path === '';
+---
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="brand">
+      <span class="brand-mark">MOT</span>
+      <span class="brand-name">Bible Study</span>
+    </a>
+    <nav>
+      <a href="/" class={isHome ? 'nav-active' : ''}>Studies</a>
+    </nav>
+  </div>
+</header>
